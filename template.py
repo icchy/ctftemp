@@ -22,8 +22,12 @@ if len(sys.argv) > 1:
     elif sys.argv[1] == 'l':
         conn = remote(LHOST, LPORT)
     elif sys.argv[1] == 'd':
-        conn = gdb.debug(['{binary}'], execute="b *{0}\nc".format(hex(EntryPoint)))
-        # conn = gdb.debug(['{binary}'], {gdbport}, env={{'LD_PRELOAD': '{libc}'}})
+        execute = """
+        b *{0}
+        c
+        """.format(hex(EntryPoint))
+        conn = gdb.debug(['{binary}'], execute=execute)
+        # conn = gdb.debug(['{binary}'], execute=execute, env={{'LD_PRELOAD': '{libc}'}})
 else:
     conn = process(['{binary}'])
     # conn = process(['{binary}'], env={{'LD_PRELOAD': '{libc}'}})
