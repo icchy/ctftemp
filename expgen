@@ -1,0 +1,59 @@
+#!/usr/bin/env python2
+import sys
+import os
+import commands
+
+GDBSERVER_PORT = 1234
+
+CURDIR = os.path.realpath(os.curdir)
+FILEDIR = os.path.realpath(os.path.dirname(__file__))
+TEMPLATE = os.path.join(FILEDIR, 'template.py')
+
+TEMPLATE_GDBCMD = """file {binary}
+target remote localhost:{gdbport}
+c
+"""
+
+TEMPLATE_MAIN = 'socat tcp-listen:{port},reuseaddr,fork exec:"./.gdbserver.sh"'
+TEMPLATE_GDBSERVER = "gdbserver localhost:{gdbport} {binary}"
+
+if len(sys.argv) < 4:
+    print >> sys.stderr, "Usage: "+os.path.basename(sys.argv[0])+" <binary> <host> <port> [<libc>]"
+else:
+    os.chdir(FILEDIR)
+    args = {
+            'binary': sys.argv[1],
+            'host': sys.argv[2],
+            'port': sys.argv[3]
+            }
+
+    READELF = None
+    if 'darwin' in sys.platform:
+        READELF = 'greadelf'
+    elif 'linux' in sys.platform:
+        READELF = 'readelf'
+    res = commands.getoutput("{0} -h ".format(READELF)+os.path.join(CURDIR, args['binary']))
+
+    if "ELF32" in res:
+        args['arch'] = 'i386'
+    elif "ELF64" in res:
+        args['arch'] = 'amd64'
+    else:
+        args['arch'] = 'unknown'
+
+    if len(sys.argv) > 4:
+        args['libc'] = sys.argv[4]
+    else:
+        args['libc'] = ''
+
+    args['gdbport'] = GDBSERVER_PORT
+
+    os.chdir(CURDIR)
+    open('exploit.py', 'w').write(open(TEMPLATE).read().format(**args))
+    open('.gdbserver.sh', 'w').write(TEMPLATE_GDBSERVER.format(**args))
+    open('server.sh', 'w').write(TEMPLATE_MAIN.format(**args))
+    open('gdbcmd', 'w').write(TEMPLATE_GDBCMD.format(**args))
+    os.chmod('.gdbserver.sh', 0755)
+    os.chmod('server.sh', 0755)
+
+sys.exit(0)
