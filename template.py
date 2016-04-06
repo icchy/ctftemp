@@ -10,7 +10,6 @@ LPORT = {port}
 
 # libc = ELF('{libc}')
 elf = ELF('{binary}')
-EntryPoint = elf.symbols['main'] or elf.entrypoint
 
 def section_addr(name, elf=elf):
     return elf.get_section_by_name(name).header['sh_addr']
@@ -23,9 +22,9 @@ if len(sys.argv) > 1:
         conn = remote(LHOST, LPORT)
     elif sys.argv[1] == 'd':
         execute = """
-        b *{0}
+        b *{{0}}
         c
-        """.format(hex(EntryPoint))
+        """.format(hex(elf.symbols['main'] or elf.entrypoint))
         conn = gdb.debug(['{binary}'], execute=execute)
         # conn = gdb.debug(['{binary}'], execute=execute, env={{'LD_PRELOAD': '{libc}'}})
 else:
@@ -36,4 +35,4 @@ else:
 
 log.info('Pwning')
 
-# conn.interactive()
+conn.interactive()
