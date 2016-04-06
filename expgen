@@ -3,19 +3,9 @@ import sys
 import os
 import commands
 
-GDBSERVER_PORT = 1234
-
 CURDIR = os.path.realpath(os.curdir)
 FILEDIR = os.path.realpath(os.path.dirname(__file__))
 TEMPLATE = os.path.join(FILEDIR, 'template.py')
-
-TEMPLATE_GDBCMD = """file {binary}
-target remote localhost:{gdbport}
-c
-"""
-
-TEMPLATE_MAIN = 'socat tcp-listen:{port},reuseaddr,fork exec:"./.gdbserver.sh"'
-TEMPLATE_GDBSERVER = "gdbserver localhost:{gdbport} {binary}"
 
 if len(sys.argv) < 4:
     print >> sys.stderr, "Usage: "+os.path.basename(sys.argv[0])+" <binary> <host> <port> [<libc>]"
@@ -46,14 +36,7 @@ else:
     else:
         args['libc'] = ''
 
-    args['gdbport'] = GDBSERVER_PORT
-
     os.chdir(CURDIR)
     open('exploit.py', 'w').write(open(TEMPLATE).read().format(**args))
-    open('.gdbserver.sh', 'w').write(TEMPLATE_GDBSERVER.format(**args))
-    open('server.sh', 'w').write(TEMPLATE_MAIN.format(**args))
-    open('gdbcmd', 'w').write(TEMPLATE_GDBCMD.format(**args))
-    os.chmod('.gdbserver.sh', 0755)
-    os.chmod('server.sh', 0755)
 
 sys.exit(0)
