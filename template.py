@@ -22,11 +22,11 @@ if len(sys.argv) > 1:
         conn = remote(LHOST, LPORT)
     elif sys.argv[1] == 'd':
         execute = """
+        # set environment LD_PRELOAD={libc}
         b *{{0}}
         c
         """.format(hex(elf.symbols['main'] or elf.entrypoint))
         conn = gdb.debug(['{binary}'], execute=execute)
-        # conn = gdb.debug(['{binary}'], execute=execute, env={{'LD_PRELOAD': '{libc}'}})
 else:
     conn = process(['{binary}'])
     # conn = process(['{binary}'], env={{'LD_PRELOAD': '{libc}'}})

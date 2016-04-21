@@ -3,6 +3,12 @@ import sys
 import os
 import commands
 
+
+TEMPLATE_GDBCMD = """file {binary}
+target remote localhost:{gdbport}
+c
+"""
+
 CURDIR = os.path.realpath(os.curdir)
 FILEDIR = os.path.realpath(os.path.dirname(__file__))
 TEMPLATE = os.path.join(FILEDIR, 'template.py')
