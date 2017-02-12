@@ -25,7 +25,7 @@ if len(sys.argv) > 1:
         # set environment LD_PRELOAD={libc}
         b *{{0}}
         c
-        """.format(hex(elf.symbols['main'] or elf.entrypoint))
+        """.format(hex(elf.symbols['main'] if 'main' in elf.symbols.keys() else elf.entrypoint))
         conn = gdb.debug(['{binary}'], execute=execute)
 else:
     conn = process(['{binary}'])
