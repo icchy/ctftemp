@@ -1,10 +1,10 @@
 import socket
 import struct
 
-RHOST = "{host}"
-RPORT = {port}
+RHOST = "${host}"
+RPORT = ${port}
 LHOST = "127.0.0.1"
-LPORT = {port}
+LPORT = ${port}
 
 def remote(host, port):
     return socket.create_connection((host, port))
@@ -34,8 +34,8 @@ if len(sys.argv) > 1:
     elif sys.argv[1] == 'l':
         conn = remote(LHOST, LPORT)
 else:
-    conn = process(['{binary}'])
-    # conn = process(['{binary}'], env={{'LD_PRELOAD': '{libc}'}})
+    conn = process(['${binary}'])
+    # conn = process(['${binary}'], env={'LD_PRELOAD': '${libc}'})
 
 # preparing for exploitation
 
