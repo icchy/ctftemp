@@ -2,10 +2,11 @@
 import sys
 import os
 import commands
+import string
 
 
-TEMPLATE_GDBCMD = """file {binary}
-target remote localhost:{gdbport}
+TEMPLATE_GDBCMD = """file ${binary}
+target remote localhost:${gdbport}
 c
 """
 
@@ -43,6 +44,6 @@ else:
         args['libc'] = ''
 
     os.chdir(CURDIR)
-    open('exploit.py', 'w').write(open(TEMPLATE).read().format(**args))
+    open('exploit.py', 'w').write(string.Template(open(TEMPLATE).read()).substitute(args))
 
 sys.exit(0)
