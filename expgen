@@ -44,6 +44,9 @@ else:
         args['libc'] = ''
 
     os.chdir(CURDIR)
+    if os.path.exists('exploit.py'):
+        if raw_input("overwrite exploit.py? [y/N] ").strip().lower() != 'y':
+            sys.exit(1)
     open('exploit.py', 'w').write(string.Template(open(TEMPLATE).read()).substitute(args))
 
 sys.exit(0)
