@@ -1,6 +1,0 @@
-#!/bin/sh
-
-for i in `seq 1 100`
-do
-  echo "AAAA$i%$i"'$08x' | $1 | grep 41414141
-done
