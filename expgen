@@ -5,11 +5,6 @@ import commands
 import string
 
 
-TEMPLATE_GDBCMD = """file ${binary}
-target remote localhost:${gdbport}
-c
-"""
-
 CURDIR = os.path.realpath(os.curdir)
 FILEDIR = os.path.realpath(os.path.dirname(__file__))
 TEMPLATE = os.path.join(FILEDIR, 'template.py')
@@ -19,30 +14,11 @@ if len(sys.argv) < 4:
 else:
     os.chdir(FILEDIR)
     args = {
-            'binary': sys.argv[1],
-            'host': sys.argv[2],
-            'port': sys.argv[3]
-            }
-
-    READELF = None
-    if 'darwin' in sys.platform:
-        READELF = 'greadelf'
-    elif 'linux' in sys.platform:
-        READELF = 'readelf'
-    res = commands.getoutput("{0} -h ".format(READELF)+os.path.join(CURDIR, args['binary']))
-
-    if "ELF32" in res:
-        args['arch'] = 'i386'
-    elif "ELF64" in res:
-        args['arch'] = 'amd64'
-    else:
-        args['arch'] = 'unknown'
-
-    if len(sys.argv) > 4:
-        args['libc'] = sys.argv[4]
-    else:
-        args['libc'] = ''
-
+        'binary': sys.argv[1],
+        'host': sys.argv[2],
+        'port': sys.argv[3],
+        'libc': sys.argv[4] if len(sys.argv) > 4 else ''
+    }
     os.chdir(CURDIR)
     if os.path.exists('exploit.py'):
         if raw_input("overwrite exploit.py? [y/N] ").strip().lower() != 'y':
